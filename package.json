@@ -17,10 +17,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint ./src --fix --color",
+    "lint": "eslint --debug ./src",
+    "lint:fix": "eslint --debug ./src --fix --color",
+    "format": "prettier --write src/**/*.js",
     "lint:css": "stylelint src",
-    "lint:css:fix": "npm run lint:css --fix"
+    "lint:css:fix": "npm run lint:css --fix",
+    "lint-staged": "lint-staged",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -41,14 +44,16 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^8.50.0",
+    "@babel/core": "^7.23.0",
+    "@babel/eslint-parser": "^7.22.15",
+    "@babel/preset-react": "^7.22.15",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
     "prettier": "^3.0.3",
@@ -57,20 +62,12 @@
     "stylelint-config-standard": "^34.0.0",
     "stylelint-config-standard-scss": "^11.0.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
-    "*.js": [
+    "*.(js|jsx)": [
       "npm run lint:fix",
       "git add"
     ],
-    "*.css, *.scss": [
-      "npm run lint:css:fix",
-      "git add"
-    ]
+    "*.js": "prettier --write"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
