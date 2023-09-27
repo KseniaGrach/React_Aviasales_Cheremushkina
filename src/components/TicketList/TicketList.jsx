@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-
 import Ticket from '../Ticket';
-import { showMoreTickets } from '../../store/ticketsList';
+
+import {getSearchIdFromApi, getTicketsFromApi, showMoreTickets} from '../../store/ticketsList';
 import filterTicketsByTransfer from '../../utils/filterTicketsByTransfer';
 import getUniqueKey from "../../utils/getUniqueKey";
 
@@ -14,9 +14,19 @@ const TicketList = () => {
   const ticketsDisplayed = useSelector((state) => state.tickets.ticketsDisplayed);
   const showAllTickets = useSelector((state) => state.tickets.showAllTickets);
   const valueFilterTransfer = useSelector((state) => state.tickets.valueFilterTransfer);
+  const stopFetch = useSelector((state) => state.tickets.stopFetch);
+
   const dispatch = useDispatch();
 
   const ticketsFilter = tickets.filter((item) => filterTicketsByTransfer(item, showAllTickets, valueFilterTransfer))
+
+  useEffect(() => () => {
+    dispatch(getSearchIdFromApi());
+  }, [dispatch]);
+
+  useEffect(() => () => {
+    if (!stopFetch) dispatch(getTicketsFromApi());
+  }, [dispatch, tickets, stopFetch]);
 
   return (
     <div className={Styles.ticket_list}>
