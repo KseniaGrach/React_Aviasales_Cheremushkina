@@ -3,7 +3,7 @@ const filterTicketsByTransfer = (ticket, showAllTickets, valueFilterTransfer) =>
     return valueFilterTransfer.includes(
       ticket.segments
         .map((element) => element.stops.length)
-        .reduce((previousValue, currentValue) => previousValue + currentValue, 0)
+        .reduce((previousValue, currentValue) => Math.max(previousValue, currentValue), 0)
     );
   }
 

@@ -31,7 +31,9 @@ const TicketList = () => {
   }, [dispatch]);
 
   useEffect(() => () => {
-    if (!stopFetch) dispatch(getTicketsFromApi());
+    if (!stopFetch) {
+      setTimeout(() => dispatch(getTicketsFromApi()), 1000);
+    }
   }, [dispatch, tickets, stopFetch, searchId]);
 
   return (
