@@ -1,9 +1,12 @@
 import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Ticket from '../Ticket';
-
 import {getSearchIdFromApi, getTicketsFromApi, showMoreTickets} from '../../store/ticketsList';
+
+import Ticket from '../Ticket';
+import WarningMessage from "../WarningMessage";
+import Preloader from "../Preloader/Preloader";
+
 import filterTicketsByTransfer from '../../utils/filterTicketsByTransfer';
 import getUniqueKey from "../../utils/getUniqueKey";
 
@@ -11,10 +14,12 @@ import Styles from './TicketList.module.scss';
 
 const TicketList = () => {
   const tickets = useSelector((state) => state.tickets.tickets);
-  const ticketsDisplayed = useSelector((state) => state.tickets.ticketsDisplayed);
-  const showAllTickets = useSelector((state) => state.tickets.showAllTickets);
   const valueFilterTransfer = useSelector((state) => state.tickets.valueFilterTransfer);
   const stopFetch = useSelector((state) => state.tickets.stopFetch);
+  const searchId = useSelector((state) => state.tickets.searchId);
+  const ticketsDisplayed = useSelector((state) => state.tickets.ticketsDisplayed);
+  const showAllTickets = useSelector((state) => state.tickets.showAllTickets);
+  const isLoaded = useSelector((state) => state.tickets.isLoaded);
 
   const dispatch = useDispatch();
 
@@ -26,10 +31,12 @@ const TicketList = () => {
 
   useEffect(() => () => {
     if (!stopFetch) dispatch(getTicketsFromApi());
-  }, [dispatch, tickets, stopFetch]);
+  }, [dispatch, tickets, stopFetch, searchId]);
 
   return (
     <div className={Styles.ticket_list}>
+      {!isLoaded && <Preloader />}
+      {ticketsFilter.length === 0 && isLoaded && <WarningMessage />}
       {
         ticketsFilter.slice(0, ticketsDisplayed).map((ticket) => (
           <Ticket key={getUniqueKey()} {...ticket} />

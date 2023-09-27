@@ -2,35 +2,17 @@
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import getFlyDuration from '../utils/getFlyDuration';
 
-export const getSearchIdFromApi = createAsyncThunk('aviasales/getSearchId', async (arg, { rejectWithValue }) => {
-  try {
-    const response = await fetch('https://aviasales-test-api.kata.academy/search');
+export const getSearchIdFromApi = createAsyncThunk('aviasales/getSearchId', async (arg, { rejectWithValue }) =>
+  fetch('https://aviasales-test-api.kata.academy/search')
+    .then(async (response) => response.json())
+    .catch((error) => rejectWithValue(error.message))
+);
 
-    if (!response.ok) {
-      return rejectWithValue(`Ошибка ответа сервера: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    return rejectWithValue(error.message);
-  }
-});
-
-export const getTicketsFromApi = createAsyncThunk('aviasales/getTickets', async (arg, { rejectWithValue }) => {
-  try {
-    const response = await fetch(
-      `https://aviasales-test-api.kata.academy/tickets?searchId=${localStorage.getItem('searchId')}`
-    );
-
-    if (!response.ok) {
-      return rejectWithValue(`Ошибка ответа сервера: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    return rejectWithValue(error.message);
-  }
-});
+export const getTicketsFromApi = createAsyncThunk('aviasales/getTickets', async (arg, { rejectWithValue }) =>
+  fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${localStorage.getItem('searchId')}`)
+    .then(async (response) => response.json())
+    .catch((error) => rejectWithValue(error.message))
+);
 
 const ticketsList = createSlice({
   name: 'tickets',
@@ -40,6 +22,9 @@ const ticketsList = createSlice({
     showAllTickets: true,
     ticketsDisplayed: 5,
     stopFetch: false,
+    isLoaded: true,
+    error: false,
+    searchId: false,
   },
   reducers: {
     showMoreTickets(state) {
@@ -71,13 +56,36 @@ const ticketsList = createSlice({
     },
   },
   extraReducers: {
+    [getSearchIdFromApi.pending]: (state) => {
+      state.isLoaded = false;
+      state.error = false;
+    },
+
+    [getTicketsFromApi.pending]: (state) => {
+      state.isLoaded = false;
+      state.error = false;
+    },
+
     [getSearchIdFromApi.fulfilled]: (state, action) => {
       localStorage.setItem('searchId', action.payload.searchId);
+      state.searchId = true;
     },
 
     [getTicketsFromApi.fulfilled]: (state, action) => {
       state.tickets = [...state.tickets, ...action.payload.tickets];
-      state.stopFetch = true;
+      state.stopFetch = action.payload.stop;
+      state.isLoaded = action.payload.stop;
+    },
+
+    [getSearchIdFromApi.rejected]: (state) => {
+      state.error = true;
+    },
+
+    [getTicketsFromApi.rejected]: (state, action) => {
+      if (action.payload !== '500') {
+        state.isLoaded = true;
+        state.error = true;
+      }
     },
   },
 });
