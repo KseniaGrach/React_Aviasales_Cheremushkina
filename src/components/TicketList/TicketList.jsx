@@ -6,6 +6,7 @@ import {getSearchIdFromApi, getTicketsFromApi, showMoreTickets} from '../../stor
 import Ticket from '../Ticket';
 import WarningMessage from "../WarningMessage";
 import Preloader from "../Preloader/Preloader";
+import ErrorMessage from "../ErrorMessage";
 
 import filterTicketsByTransfer from '../../utils/filterTicketsByTransfer';
 import getUniqueKey from "../../utils/getUniqueKey";
@@ -20,7 +21,7 @@ const TicketList = () => {
   const ticketsDisplayed = useSelector((state) => state.tickets.ticketsDisplayed);
   const showAllTickets = useSelector((state) => state.tickets.showAllTickets);
   const isLoaded = useSelector((state) => state.tickets.isLoaded);
-
+  const error = useSelector((state) => state.tickets.error);
   const dispatch = useDispatch();
 
   const ticketsFilter = tickets.filter((item) => filterTicketsByTransfer(item, showAllTickets, valueFilterTransfer))
@@ -36,6 +37,7 @@ const TicketList = () => {
   return (
     <div className={Styles.ticket_list}>
       {!isLoaded && <Preloader />}
+      {error && <ErrorMessage />}
       {ticketsFilter.length === 0 && isLoaded && <WarningMessage />}
       {
         ticketsFilter.slice(0, ticketsDisplayed).map((ticket) => (
