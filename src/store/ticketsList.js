@@ -1,16 +1,18 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
+
 import getFlyDuration from '../utils/getFlyDuration';
+import { getCookie } from '../utils/cookies';
 
 export const getSearchIdFromApi = createAsyncThunk('aviasales/getSearchId', async (arg, { rejectWithValue }) =>
   fetch('https://aviasales-test-api.kata.academy/search')
-    .then(async (response) => response.json())
+    .then(async (response) => (response.ok ? response.json() : { searchId: null }))
     .catch((error) => rejectWithValue(error.message))
 );
 
 export const getTicketsFromApi = createAsyncThunk('aviasales/getTickets', async (arg, { rejectWithValue }) =>
-  fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${localStorage.getItem('searchId')}`)
-    .then(async (response) => response.json())
+  fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${getCookie('searchId')}`)
+    .then(async (response) => (response.ok ? response.json() : { tickets: [], stop: false }))
     .catch((error) => rejectWithValue(error.message))
 );
 
@@ -55,38 +57,38 @@ const ticketsList = createSlice({
       }
     },
   },
-  extraReducers: {
-    [getSearchIdFromApi.pending]: (state) => {
+  extraReducers: (builder) => {
+    builder.addCase(getSearchIdFromApi.pending, (state) => {
       state.isLoaded = false;
       state.error = false;
-    },
+    });
 
-    [getTicketsFromApi.pending]: (state) => {
+    builder.addCase(getTicketsFromApi.pending, (state) => {
       state.isLoaded = false;
       state.error = false;
-    },
+    });
 
-    [getSearchIdFromApi.fulfilled]: (state, action) => {
-      localStorage.setItem('searchId', action.payload.searchId);
+    builder.addCase(getSearchIdFromApi.fulfilled, (state, action) => {
+      document.cookie = `searchId = ${action.payload.searchId}`;
       state.searchId = true;
-    },
+    });
 
-    [getTicketsFromApi.fulfilled]: (state, action) => {
+    builder.addCase(getTicketsFromApi.fulfilled, (state, action) => {
       state.tickets = [...state.tickets, ...action.payload.tickets];
       state.stopFetch = action.payload.stop;
       state.isLoaded = action.payload.stop;
-    },
+    });
 
-    [getSearchIdFromApi.rejected]: (state) => {
+    builder.addCase(getSearchIdFromApi.rejected, (state) => {
       state.error = true;
-    },
+    });
 
-    [getTicketsFromApi.rejected]: (state, action) => {
+    builder.addCase(getTicketsFromApi.rejected, (state, action) => {
       if (action.payload !== '500') {
         state.isLoaded = true;
         state.error = true;
       }
-    },
+    });
   },
 });
 

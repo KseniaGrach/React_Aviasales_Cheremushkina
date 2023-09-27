@@ -12,6 +12,7 @@ import filterTicketsByTransfer from '../../utils/filterTicketsByTransfer';
 import getUniqueKey from "../../utils/getUniqueKey";
 
 import Styles from './TicketList.module.scss';
+import {deleteCookie} from "../../utils/cookies";
 
 const TicketList = () => {
   const tickets = useSelector((state) => state.tickets.tickets);
@@ -26,13 +27,15 @@ const TicketList = () => {
 
   const ticketsFilter = tickets.filter((item) => filterTicketsByTransfer(item, showAllTickets, valueFilterTransfer))
 
-  useEffect(() => () => {
+  useEffect(() => {
     dispatch(getSearchIdFromApi());
+
+    return deleteCookie('searchId');
   }, [dispatch]);
 
-  useEffect(() => () => {
-    if (!stopFetch) {
-      setTimeout(() => dispatch(getTicketsFromApi()), 1000);
+  useEffect(() => {
+    if (!stopFetch && searchId) {
+      dispatch(getTicketsFromApi());
     }
   }, [dispatch, tickets, stopFetch, searchId]);
 
@@ -40,7 +43,7 @@ const TicketList = () => {
     <div className={Styles.ticket_list}>
       {!isLoaded && <Preloader />}
       {error && <ErrorMessage />}
-      {ticketsFilter.length === 0 && isLoaded && <WarningMessage />}
+      {ticketsFilter.length === 0 && !error && isLoaded && <WarningMessage />}
       {
         ticketsFilter.slice(0, ticketsDisplayed).map((ticket) => (
           <Ticket key={getUniqueKey()} {...ticket} />
