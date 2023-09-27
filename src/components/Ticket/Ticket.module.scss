@@ -4,37 +4,37 @@
   background-color: white;
   max-width: 500px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border-radius: 5px;
   box-shadow: 0 0 8px 4px rgba(150, 155, 159, 0.2);
 }
 
-.ticket__price-logo {
+.price_logo {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
-.ticket__price {
+.price {
   margin-top: auto;
   margin-bottom: auto;
   font-size: 25px;
   color: #2196F3;
 }
 
-.header__logo {
+.logo {
   margin-left: auto;
 }
 
-.ticket__information {
+.information {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
-.ticket__text {
+.text {
   margin-left: 2px;
 }
 
-.gray-text {
+.gray_text {
   color: #A0B0B9;
   margin-bottom: 5px;
 }

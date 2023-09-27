@@ -1,19 +1,37 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import './TicketList.scss';
+
 import Ticket from '../Ticket';
+import { showMoreTickets } from '../../store/ticketsList';
+import filterTicketsByTransfer from '../../utils/filterTicketsByTransfer';
+import getUniqueKey from "../../utils/getUniqueKey";
 
-const TicketList = () => (
-  <div className="ticket-list">
-    <Ticket />
-    <Ticket />
-    <Ticket />
-    <Ticket />
-    <Ticket />
-    <button type="button" className="ticket-list__button">
-      ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ!
-    </button>
-  </div>
-);
+import Styles from './TicketList.module.scss';
+
+const TicketList = () => {
+  const tickets = useSelector((state) => state.tickets.tickets);
+  const ticketsDisplayed = useSelector((state) => state.tickets.ticketsDisplayed);
+  const showAllTickets = useSelector((state) => state.tickets.showAllTickets);
+  const valueFilterTransfer = useSelector((state) => state.tickets.valueFilterTransfer);
+  const dispatch = useDispatch();
+
+  const ticketsFilter = tickets.filter((item) => filterTicketsByTransfer(item, showAllTickets, valueFilterTransfer))
+
+  return (
+    <div className={Styles.ticket_list}>
+      {
+        ticketsFilter.slice(0, ticketsDisplayed).map((ticket) => (
+          <Ticket key={getUniqueKey()} {...ticket} />
+        ))
+      }
+      {ticketsFilter.length > ticketsDisplayed && (
+        <button type="button" className={Styles.button} onClick={() => dispatch(showMoreTickets())}>
+          ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ!
+        </button>
+      )}
+    </div>
+  );
+};
 
 export default TicketList;

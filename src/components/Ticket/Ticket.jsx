@@ -1,31 +1,33 @@
+/* eslint-disable react/prop-types,spaced-comment,arrow-body-style */
 import React from 'react';
 
-import Airlineslogo from '../../assets/images/s7_airlines.png';
+import enumeration from '../../utils/enumeration';
+import { getArrivalTime, getDepartureTime, getTravelTime } from '../../utils/formatTime';
 
-import './Ticket.scss';
+import Styles from './Ticket.module.scss';
 
-const Ticket = () => (
-  <div className="ticket">
-    <div className="ticket__price-logo">
-      <div className="ticket__price"> 13 400 Р</div>
-      <img className="header__logo" alt="logo" src={Airlineslogo} />
+const Ticket = ({ price, carrier, segments }) => (
+  <div className={Styles.ticket}>
+    <div className={Styles.price_logo}>
+      <div className={Styles.price}>{price.toLocaleString()} Р</div>
+      <img className={Styles.logo} alt="logo" src={`//pics.avs.io/99/36/${carrier}.png`} />
     </div>
-    <div className="ticket__information">
-      <div className="ticket__text gray-text">MOW - HKT</div>
-      <div className="ticket__text gray-text">В ПУТИ</div>
-      <div className="ticket__text gray-text">2 ПЕРЕСАДКИ</div>
-      <div className="ticket__text"> 10:45 - 08:00</div>
-      <div className="ticket__text"> 21ч 15м</div>
-      <div className="ticket__text"> HKG, JNB</div>
-    </div>
-    <div className="ticket__information">
-      <div className="ticket__text gray-text">MOW - HKT</div>
-      <div className="ticket__text gray-text">В ПУТИ</div>
-      <div className="ticket__text gray-text">1 ПЕРЕСАДКА</div>
-      <div className="ticket__text"> 11:20-00:50</div>
-      <div className="ticket__text"> 13ч 30м</div>
-      <div className="ticket__text"> HKG, JNB</div>
-    </div>
+    {segments.map((item) => (
+      <div className={Styles.information} key={item.date}>
+        <div className={`${Styles.text} ${Styles.gray_text}`}>
+          {item.origin}-{item.destination}
+        </div>
+        <div className={`${Styles.text} ${Styles.gray_text}`}>В ПУТИ</div>
+        <div className={`${Styles.text} ${Styles.gray_text}`}>
+          {item.stops.length} {enumeration(item.stops.length)}
+        </div>
+        <div className={Styles.text}>
+          {getDepartureTime(item.date)} - {getArrivalTime(item.date, item.duration)}
+        </div>
+        <div className={Styles.text}>{getTravelTime(item.duration)}</div>
+        <div className={Styles.text}>{item.stops.join(', ')}</div>
+      </div>
+    ))}
   </div>
 );
 
