@@ -15,9 +15,26 @@ useEffect(() => {
   setCheckedAll(allChecked);
 }, [checkedFilters]);
 
+
+const handleAllCheckboxChange = () => {
+  const allChecked = checkedFilters.map(() => !checkedAll);
+  setCheckedFilters(allChecked);
+};
+
+
+
 const handleCheckboxChange = (event, index) => {
   const updatedCheckedFilters = [...checkedFilters];
-  updatedCheckedFilters[index] = event.target.checked;
+
+  if (event.target.id === "all") {
+    const allChecked = event.target.checked;
+    updatedCheckedFilters.fill(allChecked);
+    setCheckedAll(allChecked);
+  } else {
+    updatedCheckedFilters[index] = event.target.checked;
+    setCheckedAll(updatedCheckedFilters.every((checkedFilter) => checkedFilter));
+  }
+  
   setCheckedFilters(updatedCheckedFilters);
 };
 
@@ -51,7 +68,7 @@ useEffect(() => {
         name="all"
         checked={checkedAll}
         className={Styles.checkbox}
-        onChange={(event) => setCheckedAll(event.target.checked)}
+        onChange={handleAllCheckboxChange}
         />
         <label className={Styles.label} htmlFor="all">Все</label>
       </div>
