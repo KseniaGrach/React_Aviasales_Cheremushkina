@@ -26,14 +26,7 @@ const handleAllCheckboxChange = () => {
 const handleCheckboxChange = (event, index) => {
   const updatedCheckedFilters = [...checkedFilters];
 
-  if (event.target.id === "all") {
-    const allChecked = event.target.checked;
-    updatedCheckedFilters.fill(allChecked);
-    setCheckedAll(allChecked);
-  } else {
-    updatedCheckedFilters[index] = event.target.checked;
-    setCheckedAll(updatedCheckedFilters.every((checkedFilter) => checkedFilter));
-  }
+  updatedCheckedFilters[index] = event.target.checked;
   
   setCheckedFilters(updatedCheckedFilters);
 };
