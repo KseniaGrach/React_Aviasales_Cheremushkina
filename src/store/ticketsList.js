@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
+
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 
 import getFlyDuration from '../utils/getFlyDuration';
 import { getCookie } from '../utils/cookies';
+
 
 export const getSearchIdFromApi = createAsyncThunk('aviasales/getSearchId', async (arg, { rejectWithValue }) =>
   fetch('https://aviasales-test-api.kata.academy/search')
@@ -49,12 +51,8 @@ const ticketsList = createSlice({
       state.showAllTickets = action.payload;
     },
 
-    setValueFilterTicket(state, action) {
-      if (action.payload.isChecked) {
-        state.valueFilterTransfer.push(action.payload.filterValue);
-      } else {
-        state.valueFilterTransfer = state.valueFilterTransfer.filter((item) => item !== action.payload.filterValue);
-      }
+    switchFilters(state, action) {
+      state.valueFilterTransfer = action.payload.filter((item) => item.checked).map((item) => item.value);
     },
   },
   extraReducers: (builder) => {
@@ -68,10 +66,12 @@ const ticketsList = createSlice({
       state.error = false;
     });
 
+
     builder.addCase(getSearchIdFromApi.fulfilled, (state, action) => {
       document.cookie = `searchId = ${action.payload.searchId}`;
       state.searchId = true;
     });
+
 
     builder.addCase(getTicketsFromApi.fulfilled, (state, action) => {
       state.tickets = [...state.tickets, ...action.payload.tickets];
@@ -79,9 +79,11 @@ const ticketsList = createSlice({
       state.isLoaded = action.payload.stop;
     });
 
+
     builder.addCase(getSearchIdFromApi.rejected, (state) => {
       state.error = true;
     });
+
 
     builder.addCase(getTicketsFromApi.rejected, (state, action) => {
       if (action.payload !== '500') {
@@ -92,7 +94,7 @@ const ticketsList = createSlice({
   },
 });
 
-export const { showMoreTickets, sortTicketsByPrice, sortTicketsByDuration, setValueFilterTicket, switchFilterAll } =
+export const { showMoreTickets, sortTicketsByPrice, sortTicketsByDuration, switchFilters, switchFilterAll } =
   ticketsList.actions;
 
 export default ticketsList.reducer;
